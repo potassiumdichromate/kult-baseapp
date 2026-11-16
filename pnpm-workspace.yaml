@@ -1,0 +1,6 @@
+# Optional native add-ons pulled in by wallet libraries. Each has a pure-JS
+# fallback, so their install scripts are declined rather than run.
+allowBuilds:
+  bufferutil: false
+  keccak: false
+  utf-8-validate: false
