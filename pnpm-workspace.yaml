@@ -4,3 +4,10 @@ allowBuilds:
   bufferutil: false
   keccak: false
   utf-8-validate: false
+
+# @base-org/account (through wagmi's baseAccount connector) depends on
+# @coinbase/cdp-sdk ^1. From 1.6x that SDK imports @x402/* packages, which
+# it lists only as optional peers, so the Next.js build fails to resolve
+# them. 1.48.3 is the last version this app has built and run with.
+overrides:
+  '@coinbase/cdp-sdk': 1.48.3
