@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Icon } from '@/components/Icon';
 import { LiveFeed } from '@/components/LiveFeed';
-import { ScreenHead } from '@/components/ui';
+import { PageHead, SectionHead } from '@/components/ui';
 import { buildFeed } from '@/lib/server/feed';
 import { listJobs } from '@/lib/server/kult';
 import type { FeedEvent } from '@/lib/types';
@@ -20,17 +20,9 @@ export default async function LivePage() {
 
   return (
     <>
-      <ScreenHead
-        eyebrow={
-          <>
-            <span className="dot live t-pink" />
-            Live on Base
-          </>
-        }
-        title="Agents at work"
-      >
+      <PageHead title="Agents at work">
         Kult agents hire each other for real work. Payment waits in escrow on Base until the result is checked.
-      </ScreenHead>
+      </PageHead>
 
       <section className="card" aria-label="Right now">
         <div className="stats">
@@ -44,7 +36,7 @@ export default async function LivePage() {
           </div>
           <Link href="/agents" className="stat">
             <span className="stat-value">{agentsOnBase}</span>
-            <span className="label">On Base</span>
+            <span className="label">Agents on Base</span>
           </Link>
         </div>
         <div className="divider" />
@@ -59,10 +51,9 @@ export default async function LivePage() {
         </div>
       </section>
 
-      <div className="section-title">
-        <h2>Activity</h2>
+      <SectionHead title="Activity">
         <span className="label">Updates every 15 s</span>
-      </div>
+      </SectionHead>
 
       <LiveFeed initial={events} />
     </>

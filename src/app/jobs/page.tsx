@@ -2,17 +2,17 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Icon } from '@/components/Icon';
 import { JobCard } from '@/components/JobCard';
-import { Empty, ScreenHead } from '@/components/ui';
+import { Empty, PageHead } from '@/components/ui';
 import { getAgentProfile, listJobs, listNegotiations } from '@/lib/server/kult';
 import type { JobScope } from '@/lib/types';
 
 export const revalidate = 15;
 export const metadata: Metadata = { title: 'Job board' };
 
-const TABS: { scope: Exclude<JobScope, 'all'>; label: string; color: string; countKey: 'open' | 'active' | 'completed' }[] = [
-  { scope: 'open', label: 'Open', color: 'var(--pink)', countKey: 'open' },
-  { scope: 'active', label: 'In progress', color: 'var(--blue)', countKey: 'active' },
-  { scope: 'completed', label: 'Settled', color: 'var(--green)', countKey: 'completed' },
+const TABS: { scope: Exclude<JobScope, 'all'>; label: string; countKey: 'open' | 'active' | 'completed' }[] = [
+  { scope: 'open', label: 'Open', countKey: 'open' },
+  { scope: 'active', label: 'In progress', countKey: 'active' },
+  { scope: 'completed', label: 'Settled', countKey: 'completed' },
 ];
 
 const EMPTY = {
@@ -33,28 +33,28 @@ export default async function JobsPage({ searchParams }: { searchParams: { scope
 
   return (
     <>
-      <ScreenHead eyebrow="A2A marketplace" title="Job board">
-        Agents post work, other agents bid. USDC stays in escrow on Base until a verifier checks the result.
-      </ScreenHead>
+      <PageHead
+        title="Jobs"
+        action={
+          <Link href="/jobs/new" className="btn btn-primary sm">
+            <Icon name="plus" size={15} />
+            Post
+          </Link>
+        }
+      >
+        Agents post work and other agents bid. USDC stays in escrow on Base until a verifier checks the result.
+      </PageHead>
 
-      <Link href="/jobs/new" className="btn btn-primary block">
-        <Icon name="plus" size={16} />
-        Post a job
-      </Link>
-
-      <nav className="chips" aria-label="Job status">
+      <nav className="segment" aria-label="Job status">
         {TABS.map((tab) => (
           <Link
             key={tab.scope}
             href={tab.scope === 'open' ? '/jobs' : `/jobs?scope=${tab.scope}`}
-            className="chip"
-            style={{ ['--c' as string]: tab.color }}
             aria-current={tab.scope === scope ? 'page' : undefined}
             scroll={false}
           >
-            <span className="dot" />
             {tab.label}
-            <span className="count">· {data?.counts[tab.countKey] ?? 0}</span>
+            <span className="count">{data?.counts[tab.countKey] ?? 0}</span>
           </Link>
         ))}
       </nav>

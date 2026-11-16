@@ -5,22 +5,32 @@ import type { JobStatus } from '@/lib/types';
 import { Icon, type IconName } from './Icon';
 
 const TONE_COLOR: Record<Tone, string> = {
-  pink: 'var(--pink)',
+  violet: 'var(--violet)',
   blue: 'var(--blue)',
   green: 'var(--green)',
-  gold: 'var(--gold)',
+  amber: 'var(--amber)',
   red: 'var(--red)',
-  violet: 'var(--violet-deep)',
-  dim: '#5d5480',
+  dim: 'var(--dim)',
 };
 
-export function ScreenHead({ eyebrow, title, children }: { eyebrow: ReactNode; title: ReactNode; children?: ReactNode }) {
+export function PageHead({ title, action, children }: { title: ReactNode; action?: ReactNode; children?: ReactNode }) {
   return (
-    <header className="screen-head">
-      <span className="eyebrow">{eyebrow}</span>
-      <h1>{title}</h1>
+    <header className="page-head">
+      <div className="spread" style={{ alignItems: 'flex-end' }}>
+        <h1>{title}</h1>
+        {action}
+      </div>
       {children ? <p className="muted">{children}</p> : null}
     </header>
+  );
+}
+
+export function SectionHead({ title, children }: { title: ReactNode; children?: ReactNode }) {
+  return (
+    <div className="section-head">
+      <h2>{title}</h2>
+      {children}
+    </div>
   );
 }
 
@@ -42,16 +52,11 @@ export function Money({ value, min, max, currency = 'USDC', size }: {
 
 export function StatusWord({ status }: { status: JobStatus }) {
   const s = jobStatus(status);
-  return (
-    <span className={`status t-${s.tone}`}>
-      <span className={`dot${s.live ? ' live' : ''}`} />
-      {s.label}
-    </span>
-  );
+  return <span className={`status t-${s.tone}`}>{s.label}</span>;
 }
 
-export function Tag({ tone = 'violet', children }: { tone?: Tone | 'base'; children: ReactNode }) {
-  return <span className={`tag t-${tone}`}>{children}</span>;
+export function Tag({ tone, children }: { tone?: Tone; children: ReactNode }) {
+  return <span className={`tag${tone ? ` t-${tone}` : ''}`}>{children}</span>;
 }
 
 export function AgentAvatar({ name, clan, size }: { name: string; clan?: string | null; size?: 'xs' | 'sm' | 'lg' }) {
@@ -62,29 +67,28 @@ export function AgentAvatar({ name, clan, size }: { name: string; clan?: string 
   );
 }
 
-export function IconTile({ name, color, small }: { name: IconName; color: string; small?: boolean }) {
+export function IconCircle({ name }: { name: IconName }) {
   return (
-    <span className={`tile${small ? ' sm' : ''}`} style={{ ['--c' as string]: color }} aria-hidden="true">
+    <span className="icon-circle" aria-hidden="true">
       <Icon name={name} />
     </span>
   );
 }
 
-export function ChainLink({ hash, label = 'BaseScan' }: { hash: string; label?: string }) {
+export function ExternalLink({ href, children, label }: { href: string; children: ReactNode; label?: string }) {
   return (
-    <a className="chain-link" href={txUrl(hash)} target="_blank" rel="noreferrer" aria-label={`View transaction ${shortHash(hash)} on BaseScan`}>
-      {label}
-      <Icon name="external" size={13} />
+    <a className="link" href={href} target="_blank" rel="noreferrer" aria-label={label}>
+      {children}
+      <Icon name="external" size={12} />
     </a>
   );
 }
 
-export function QuietLink({ href, children = 'View' }: { href: string; children?: ReactNode }) {
+export function ChainLink({ hash, label = 'BaseScan' }: { hash: string; label?: string }) {
   return (
-    <Link className="quiet" href={href}>
-      {children}
-      <Icon className="arrow" name="arrow" size={14} />
-    </Link>
+    <ExternalLink href={txUrl(hash)} label={`View transaction ${shortHash(hash)} on BaseScan`}>
+      {label}
+    </ExternalLink>
   );
 }
 
@@ -98,10 +102,10 @@ export function Empty({ title, children, action }: { title: string; children?: R
   );
 }
 
-export function Notice({ tone = 'blue', children }: { tone?: Tone; children: ReactNode }) {
+export function Notice({ tone, children }: { tone?: Tone; children: ReactNode }) {
   return (
-    <div className={`notice t-${tone}`}>
-      <Icon name="info" size={17} />
+    <div className={`notice${tone ? ` t-${tone}` : ''}`}>
+      <Icon name="info" size={16} />
       <div>{children}</div>
     </div>
   );
@@ -109,8 +113,8 @@ export function Notice({ tone = 'blue', children }: { tone?: Tone; children: Rea
 
 export function BackLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <Link href={href} className="quiet" style={{ alignSelf: 'flex-start' }}>
-      <Icon name="back" size={14} />
+    <Link href={href} className="back">
+      <Icon name="back" size={16} />
       {children}
     </Link>
   );

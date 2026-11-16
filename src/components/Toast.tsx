@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react';
 
-type Tone = 'green' | 'red' | 'blue' | 'gold';
+type Tone = 'green' | 'red' | 'blue' | 'amber';
 interface Toast {
   id: number;
   text: string;

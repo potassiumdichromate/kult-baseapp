@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { JobCard } from '@/components/JobCard';
-import { Icon } from '@/components/Icon';
-import { AgentAvatar, BackLink, ChainLink, Money, Tag } from '@/components/ui';
+import { AgentAvatar, BackLink, ChainLink, ExternalLink, Money, Notice, SectionHead, Tag } from '@/components/ui';
 import { addressUrl, erc8004Url, metricName, shortHash, titleCase, usdcFromBaseUnits } from '@/lib/format';
 import {
   getAgentIdentity,
@@ -54,7 +53,7 @@ export default async function AgentPage({ params }: { params: { id: string } }) 
             <h1 style={{ fontSize: 26, overflowWrap: 'anywhere' }}>{profile.name}</h1>
             <p className="dim" style={{ fontSize: 13.5, marginTop: 4 }}>{meta.join(' · ')}</p>
             <div className="row wrap" style={{ gap: 6, marginTop: 10 }}>
-              {erc8004Id ? <Tag tone="base">On Base</Tag> : <Tag tone="dim">Not on Base yet</Tag>}
+              {erc8004Id ? <Tag tone="blue">On Base</Tag> : <Tag tone="dim">Not on Base yet</Tag>}
               {profile.retired ? <Tag tone="red">Retired</Tag> : null}
               {extra?.autoBid?.enabled ? <Tag tone="green">Auto-bid on</Tag> : null}
             </div>
@@ -94,27 +93,18 @@ export default async function AgentPage({ params }: { params: { id: string } }) 
           <div style={{ marginTop: 6 }}>
             <div className="kv">
               <span>Agent ID</span>
-              <a className="chain-link" href={erc8004Url(erc8004Id)} target="_blank" rel="noreferrer">
-                #{erc8004Id}
-                <Icon name="external" size={13} />
-              </a>
+              <ExternalLink href={erc8004Url(erc8004Id)}>#{erc8004Id}</ExternalLink>
             </div>
             {identity.eoaAddress ? (
               <div className="kv">
                 <span>Agent wallet</span>
-                <a className="chain-link" href={addressUrl(identity.eoaAddress)} target="_blank" rel="noreferrer">
-                  {shortHash(identity.eoaAddress)}
-                  <Icon name="external" size={13} />
-                </a>
+                <ExternalLink href={addressUrl(identity.eoaAddress)}>{shortHash(identity.eoaAddress)}</ExternalLink>
               </div>
             ) : null}
             {identity.ownerWallet ? (
               <div className="kv">
                 <span>Owner</span>
-                <a className="chain-link" href={addressUrl(identity.ownerWallet)} target="_blank" rel="noreferrer">
-                  {shortHash(identity.ownerWallet)}
-                  <Icon name="external" size={13} />
-                </a>
+                <ExternalLink href={addressUrl(identity.ownerWallet)}>{shortHash(identity.ownerWallet)}</ExternalLink>
               </div>
             ) : null}
             {identity.registerTxHash ? (
@@ -138,9 +128,10 @@ export default async function AgentPage({ params }: { params: { id: string } }) 
           </p>
         )}
         {extra?.autoBid?.enabled && extra.autoBid.floorBaseUnits ? (
-          <div className="well" style={{ marginTop: 12, fontSize: 14 }}>
-            <span className="muted">Bids on its own for jobs paying at least </span>
-            <Money value={usdcFromBaseUnits(extra.autoBid.floorBaseUnits)} size={14} />
+          <div style={{ marginTop: 12 }}>
+            <Notice>
+              Bids on its own for jobs paying at least <Money value={usdcFromBaseUnits(extra.autoBid.floorBaseUnits)} size={13.5} />
+            </Notice>
           </div>
         ) : null}
       </section>
@@ -163,12 +154,11 @@ export default async function AgentPage({ params }: { params: { id: string } }) 
         </section>
       ) : null}
 
-      <div className="section-title">
-        <h2>Jobs</h2>
+      <SectionHead title="Jobs">
         <span className="label">
           {posted.length} posted · {taken.length} taken
         </span>
-      </div>
+      </SectionHead>
 
       {posted.length + taken.length === 0 ? (
         <div className="empty">

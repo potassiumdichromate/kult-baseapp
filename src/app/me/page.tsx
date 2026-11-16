@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Icon, UsdcCoin } from '@/components/Icon';
+import { Icon, UsdcCoin, type IconName } from '@/components/Icon';
 import { SignInButton } from '@/components/SignInButton';
 import { useToast } from '@/components/Toast';
 import { formatBalance, useUsdcBalance } from '@/components/UsdcBalance';
-import { AgentAvatar, Empty, IconTile, Notice, ScreenHead } from '@/components/ui';
+import { AgentAvatar, Empty, ExternalLink, IconCircle, Notice, PageHead, SectionHead } from '@/components/ui';
 import { addressUrl, shortHash, titleCase } from '@/lib/format';
 import { useMyAgents } from '@/lib/useMyAgents';
 import { useSession, useSignOut } from '@/lib/useSession';
@@ -16,9 +16,8 @@ export default function MePage() {
   if (session.isLoading) {
     return (
       <div className="stack" aria-busy="true">
-        <span className="skeleton" style={{ width: 120, height: 12 }} />
-        <span className="skeleton" style={{ width: 220, height: 30 }} />
-        <span className="skeleton" style={{ height: 160, borderRadius: 18 }} />
+        <span className="skeleton" style={{ width: 200, height: 30 }} />
+        <span className="skeleton" style={{ height: 170, borderRadius: 22 }} />
       </div>
     );
   }
@@ -29,20 +28,20 @@ export default function MePage() {
 function SignedOut() {
   return (
     <>
-      <ScreenHead eyebrow="Your account" title="Sign in with Base">
+      <PageHead title="Sign in with Base">
         Use the Base Account you already have in Coinbase Wallet. No password, no seed phrase.
-      </ScreenHead>
+      </PageHead>
 
       <SignInButton block />
 
       <section className="card flush list" aria-label="What you can do">
-        <Benefit icon="jobs" color="var(--f-jobs)" title="Hire agents for your agents">
+        <Benefit icon="jobs" title="Hire agents for your agents">
           Post a job, agents bid, the best offer wins.
         </Benefit>
-        <Benefit icon="shield" color="var(--f-deals)" title="Pay only for verified work">
+        <Benefit icon="shield" title="Pay only for verified work">
           USDC waits in escrow until a verifier checks the result.
         </Benefit>
-        <Benefit icon="coin" color="var(--f-me)" title="Get paid in USDC">
+        <Benefit icon="coin" title="Get paid in USDC">
           When your agent does the work, earnings land on Base.
         </Benefit>
       </section>
@@ -52,12 +51,12 @@ function SignedOut() {
   );
 }
 
-function Benefit({ icon, color, title, children }: { icon: 'jobs' | 'shield' | 'coin'; color: string; title: string; children: string }) {
+function Benefit({ icon, title, children }: { icon: IconName; title: string; children: string }) {
   return (
-    <div className="list-row" style={{ alignItems: 'flex-start', paddingTop: 14, paddingBottom: 14 }}>
-      <IconTile name={icon} color={color} small />
+    <div className="list-row" style={{ alignItems: 'flex-start' }}>
+      <IconCircle name={icon} />
       <div>
-        <div className="display" style={{ fontSize: 15 }}>{title}</div>
+        <div style={{ fontWeight: 600, fontSize: 15 }}>{title}</div>
         <div className="dim" style={{ fontSize: 13.5, marginTop: 2 }}>{children}</div>
       </div>
     </div>
@@ -72,22 +71,19 @@ function Account({ address }: { address: string }) {
 
   return (
     <>
-      <ScreenHead eyebrow="Your account" title="Base Account" />
+      <PageHead title="Account" />
 
       <section className="card">
         <div className="spread">
           <span className="label">USDC on Base</span>
-          <a className="chain-link" href={addressUrl(address)} target="_blank" rel="noreferrer">
-            {shortHash(address)}
-            <Icon name="external" size={13} />
-          </a>
+          <ExternalLink href={addressUrl(address)}>{shortHash(address)}</ExternalLink>
         </div>
         <div className="row" style={{ marginTop: 10, gap: 12 }}>
           <UsdcCoin className="coin" />
           {balance.isLoading ? (
-            <span className="skeleton" style={{ width: 110, height: 30 }} />
+            <span className="skeleton" style={{ width: 110, height: 32 }} />
           ) : (
-            <span className="money" style={{ fontSize: 32 }}>
+            <span className="money" style={{ fontSize: 34 }}>
               {formatBalance(balance.data)}
               <span className="cur">USDC</span>
             </span>
@@ -110,13 +106,10 @@ function Account({ address }: { address: string }) {
         </div>
       </section>
 
-      <div className="section-title">
-        <h2>Your agents</h2>
-        {agents.data ? <span className="label">{agents.data.length}</span> : null}
-      </div>
+      <SectionHead title="Your agents">{agents.data ? <span className="label">{agents.data.length}</span> : null}</SectionHead>
 
       {agents.isLoading ? (
-        <span className="skeleton" style={{ height: 136, borderRadius: 18 }} />
+        <span className="skeleton" style={{ height: 136, borderRadius: 22 }} />
       ) : agents.isError ? (
         <Empty title="Could not load your agents">Try again in a moment.</Empty>
       ) : !agents.data?.length ? (
@@ -127,21 +120,21 @@ function Account({ address }: { address: string }) {
         <section className="card flush list" aria-label="Your agents">
           {agents.data.map((a) => (
             <div key={a.id} className="list-row">
+              <Link href={`/agents/${a.id}`} className="row-link" aria-label={a.name} />
               <AgentAvatar name={a.name} clan={a.clan} size="sm" />
-              <Link href={`/agents/${a.id}`} className="grow">
-                <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.name}</div>
+              <div className="grow">
+                <div className="truncate" style={{ fontWeight: 600 }}>{a.name}</div>
                 <div className="dim" style={{ fontSize: 13 }}>
                   ELO {a.eloRating}
                   {a.archetype ? ` · ${titleCase(a.archetype)}` : ''}
                 </div>
-              </Link>
+              </div>
               {a.erc8004AgentId ? (
-                <Link href={`/jobs/new?agent=${a.id}`} className="quiet">
+                <Link href={`/jobs/new?agent=${a.id}`} className="btn btn-ghost sm above">
                   Hire for it
-                  <Icon className="arrow" name="arrow" size={14} />
                 </Link>
               ) : (
-                <span className="status t-dim">Not on Base</span>
+                <span className="tag t-dim">Not on Base</span>
               )}
             </div>
           ))}

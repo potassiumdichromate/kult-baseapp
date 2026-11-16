@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { SignInButton } from '@/components/SignInButton';
 import { useToast } from '@/components/Toast';
-import { AgentAvatar, BackLink, Empty, Money, Notice, ScreenHead } from '@/components/ui';
+import { AgentAvatar, BackLink, Empty, Money, Notice, PageHead } from '@/components/ui';
 import { api } from '@/lib/api';
 import { GAMES, TARGET_METRICS, metricName, predicate } from '@/lib/format';
 import type { MyAgent, ParsedRequirements, Predicate } from '@/lib/types';
@@ -24,9 +24,9 @@ export function PostJob({ preselectedAgentId }: { preselectedAgentId: string | n
   const head = (
     <>
       <BackLink href="/jobs">Job board</BackLink>
-      <ScreenHead eyebrow="New job" title="Post a job">
+      <PageHead title="Post a job">
         Say what you need in plain words. You check what we understood before anything goes on Base.
-      </ScreenHead>
+      </PageHead>
     </>
   );
 
@@ -34,7 +34,7 @@ export function PostJob({ preselectedAgentId }: { preselectedAgentId: string | n
     return (
       <>
         {head}
-        <span className="skeleton" style={{ height: 300, borderRadius: 18 }} />
+        <span className="skeleton" style={{ height: 300, borderRadius: 22 }} />
       </>
     );
   }
@@ -134,16 +134,15 @@ function JobForm({ agents, preselectedAgentId }: { agents: MyAgent[]; preselecte
     <>
       <section className="card">
         <div className="field">
-          <span className="label">Posting as</span>
-          <div className="chips" role="radiogroup" aria-label="Agent posting the job">
+          <span className="field-label">Posting as</span>
+          <div className="choices" role="radiogroup" aria-label="Agent posting the job">
             {agents.map((a) => (
               <button
                 key={a.id}
                 type="button"
                 role="radio"
                 aria-checked={a.id === agentId}
-                className="chip"
-                style={{ ['--c' as string]: 'var(--pink)', paddingLeft: 8 }}
+                className="choice"
                 onClick={() => setAgentId(a.id)}
               >
                 <AgentAvatar name={a.name} clan={a.clan} size="xs" />
@@ -156,7 +155,7 @@ function JobForm({ agents, preselectedAgentId }: { agents: MyAgent[]; preselecte
         <div className="divider" />
 
         <label className="field">
-          <span className="label">What do you need?</span>
+          <span className="field-label">What do you need?</span>
           <textarea
             className="textarea"
             value={prompt}
@@ -170,7 +169,7 @@ function JobForm({ agents, preselectedAgentId }: { agents: MyAgent[]; preselecte
         <div className="divider" />
 
         <div className="field">
-          <span className="label">Budget</span>
+          <span className="field-label">Budget</span>
           <div className="row" style={{ gap: 10 }}>
             <label className="input-affix grow">
               <span className="visually-hidden">Minimum budget in USDC</span>
@@ -206,14 +205,14 @@ function JobForm({ agents, preselectedAgentId }: { agents: MyAgent[]; preselecte
 
           {needsCare ? (
             <div style={{ marginTop: 12 }}>
-              <Notice tone="gold">We were not sure about part of this. Check the game and the target below.</Notice>
+              <Notice tone="amber">We were not sure about part of this. Check the game and the target below.</Notice>
             </div>
           ) : null}
 
           <div className="divider" />
 
           <label className="field">
-            <span className="label">Game</span>
+            <span className="field-label">Game</span>
             <select className="select" value={gameId} onChange={(e) => setGameId(e.target.value)}>
               <option value="" disabled>
                 Choose a game
@@ -227,7 +226,7 @@ function JobForm({ agents, preselectedAgentId }: { agents: MyAgent[]; preselecte
           </label>
 
           <div className="field" style={{ marginTop: 14 }}>
-            <span className="label">Target</span>
+            <span className="field-label">Target</span>
             <div className="row" style={{ gap: 8 }}>
               <select
                 className="select grow"
@@ -295,7 +294,7 @@ function JobForm({ agents, preselectedAgentId }: { agents: MyAgent[]; preselecte
 
       <p className="dim" style={{ fontSize: 13, textAlign: 'center' }}>
         Not sure what to ask for?{' '}
-        <Link href="/jobs" style={{ color: 'var(--blue)' }}>
+        <Link href="/jobs" className="link">
           See open jobs
         </Link>
       </p>

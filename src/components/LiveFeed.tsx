@@ -4,16 +4,16 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import type { FeedEvent, FeedType } from '@/lib/types';
-import { FeedEventCard } from './FeedEvent';
+import { FeedEventRow } from './FeedEvent';
 import { Empty } from './ui';
 
 type Filter = 'all' | 'jobs' | 'bids' | 'agents';
 
-const FILTERS: { id: Filter; label: string; color: string; types: FeedType[] | null }[] = [
-  { id: 'all', label: 'All', color: 'var(--pink)', types: null },
-  { id: 'jobs', label: 'Jobs', color: 'var(--f-jobs)', types: ['job.posted', 'job.funded', 'job.delivered', 'job.settled', 'job.refunded'] },
-  { id: 'bids', label: 'Bids', color: 'var(--violet-deep)', types: ['job.bid'] },
-  { id: 'agents', label: 'Agents', color: 'var(--pink)', types: ['agent.registered'] },
+const FILTERS: { id: Filter; label: string; types: FeedType[] | null }[] = [
+  { id: 'all', label: 'All', types: null },
+  { id: 'jobs', label: 'Jobs', types: ['job.posted', 'job.funded', 'job.delivered', 'job.settled', 'job.refunded'] },
+  { id: 'bids', label: 'Bids', types: ['job.bid'] },
+  { id: 'agents', label: 'Agents', types: ['agent.registered'] },
 ];
 
 export function LiveFeed({ initial }: { initial: FeedEvent[] }) {
@@ -27,7 +27,7 @@ export function LiveFeed({ initial }: { initial: FeedEvent[] }) {
     refetchInterval: 15_000,
   });
 
-  // Keep "2m ago" honest without refetching anything.
+  // Keep the relative times honest without refetching anything.
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 30_000);
     return () => window.clearInterval(id);
@@ -45,19 +45,11 @@ export function LiveFeed({ initial }: { initial: FeedEvent[] }) {
 
   return (
     <>
-      <div className="chips" role="group" aria-label="Filter activity">
+      <div className="segment" role="group" aria-label="Filter activity">
         {FILTERS.map((f) => (
-          <button
-            key={f.id}
-            type="button"
-            className="chip"
-            style={{ ['--c' as string]: f.color }}
-            aria-pressed={filter === f.id}
-            onClick={() => setFilter(f.id)}
-          >
-            <span className="dot" />
+          <button key={f.id} type="button" aria-pressed={filter === f.id} onClick={() => setFilter(f.id)}>
             {f.label}
-            <span className="count">· {counts[f.id]}</span>
+            <span className="count">{counts[f.id]}</span>
           </button>
         ))}
       </div>
@@ -69,11 +61,11 @@ export function LiveFeed({ initial }: { initial: FeedEvent[] }) {
           {filter === 'all' ? 'When agents post jobs, bid and get paid, it shows up here as it happens.' : 'No events of this kind yet.'}
         </Empty>
       ) : (
-        <div className="stack">
+        <section className="card flush list" aria-label="Activity">
           {events.map((event) => (
-            <FeedEventCard key={event.id} event={event} now={now} />
+            <FeedEventRow key={event.id} event={event} now={now} />
           ))}
-        </div>
+        </section>
       )}
     </>
   );

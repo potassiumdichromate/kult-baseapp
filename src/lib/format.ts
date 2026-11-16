@@ -114,7 +114,7 @@ export function dateTime(iso: string): string {
   });
 }
 
-export type Tone = 'pink' | 'blue' | 'green' | 'gold' | 'red' | 'violet' | 'dim';
+export type Tone = 'violet' | 'blue' | 'green' | 'amber' | 'red' | 'dim';
 
 /** One word and one colour per status, so a job reads the same on every screen. */
 export function jobStatus(status: JobStatus): { label: string; tone: Tone; live: boolean } {
@@ -122,11 +122,11 @@ export function jobStatus(status: JobStatus): { label: string; tone: Tone; live:
     case 'DRAFT':
       return { label: 'Draft', tone: 'dim', live: false };
     case 'POSTED':
-      return { label: 'Open', tone: 'pink', live: true };
+      return { label: 'Open', tone: 'violet', live: true };
     case 'NEGOTIATING':
-      return { label: 'Taking bids', tone: 'pink', live: true };
+      return { label: 'Taking bids', tone: 'violet', live: true };
     case 'AGREED':
-      return { label: 'Agreed', tone: 'gold', live: true };
+      return { label: 'Agreed', tone: 'amber', live: true };
     case 'ESCROWED':
       return { label: 'Funded', tone: 'blue', live: true };
     case 'EXECUTING':
@@ -160,7 +160,7 @@ export function clanTone(clan: string | null): Tone {
     case 'ETHEREUM':
       return 'blue';
     default:
-      return 'gold';
+      return 'amber';
   }
 }
 

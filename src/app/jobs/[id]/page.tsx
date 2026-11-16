@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { Icon } from '@/components/Icon';
-import { AgentAvatar, BackLink, ChainLink, Money, StatusWord, Tag } from '@/components/ui';
+import { AgentAvatar, BackLink, ChainLink, ExternalLink, Money, SectionHead, StatusWord, Tag } from '@/components/ui';
 import {
   addressUrl,
   dateTime,
@@ -108,32 +108,29 @@ export default async function JobPage({ params }: { params: { id: string } }) {
     <>
       <BackLink href="/jobs">Job board</BackLink>
 
-      <header className="screen-head">
-        <div className="row wrap" style={{ gap: 10 }}>
-          <Tag tone="violet">{gameName(job.gameId)}</Tag>
+      <header className="page-head">
+        <div className="row wrap" style={{ gap: 8 }}>
+          <Tag>{gameName(job.gameId)}</Tag>
           <StatusWord status={job.status} />
         </div>
         <h1>{job.target ? predicate(job.target) : 'Target to be confirmed'}</h1>
-        <p className="muted">“{job.prompt}”</p>
+        <p className="muted">{job.prompt}</p>
       </header>
 
       <section className="card" aria-label="Terms">
         <div className="spread">
           <span className="label">{job.agreedPrice ? 'Agreed price' : 'Budget'}</span>
           {job.tx.fund ? (
-            <span className="status t-green">
-              <span className="dot" />
-              In escrow
-            </span>
+            <span className="status t-green">In escrow</span>
           ) : (
             <span className="label">Not funded yet</span>
           )}
         </div>
-        <div style={{ marginTop: 6 }}>
+        <div style={{ marginTop: 8 }}>
           {job.agreedPrice ? (
-            <Money value={usdc(job.agreedPrice.display)} size={30} />
+            <Money value={usdc(job.agreedPrice.display)} size={32} />
           ) : (
-            <Money min={usdc(job.budget.min)} max={usdc(job.budget.max)} size={30} />
+            <Money min={usdc(job.budget.min)} max={usdc(job.budget.max)} size={32} />
           )}
         </div>
         <div className="divider" />
@@ -141,7 +138,7 @@ export default async function JobPage({ params }: { params: { id: string } }) {
           <span>Posted by</span>
           <Link href={`/agents/${job.creatorAgentId}`} className="row" style={{ gap: 8, justifyContent: 'flex-end' }}>
             <AgentAvatar name={creatorName} clan={creator?.clan} size="xs" />
-            <strong style={{ fontWeight: 600 }}>{creatorName}</strong>
+            <span style={{ fontWeight: 600 }}>{creatorName}</span>
           </Link>
         </div>
         <div className="kv">
@@ -179,10 +176,9 @@ export default async function JobPage({ params }: { params: { id: string } }) {
         </ol>
       </section>
 
-      <div className="section-title">
-        <h2>Bids</h2>
+      <SectionHead title="Bids">
         <span className="label">{negotiations.length} total</span>
-      </div>
+      </SectionHead>
 
       {negotiations.length === 0 ? (
         <div className="empty">
@@ -199,8 +195,8 @@ export default async function JobPage({ params }: { params: { id: string } }) {
               <Link key={n.id} href={`/agents/${n.providerAgentId}`} className="list-row">
                 <AgentAvatar name={name} clan={p?.clan} size="sm" />
                 <div className="grow">
-                  <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
-                  <div className="dim" style={{ fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div className="truncate" style={{ fontWeight: 600 }}>{name}</div>
+                  <div className="dim truncate" style={{ fontSize: 13 }}>
                     {p ? `ELO ${p.arena.elo} · ` : ''}
                     {n.agreedPrice ? 'Agreed' : waitingOn ? `${waitingOn} to reply` : bidState(n.state)}
                   </div>
@@ -220,41 +216,35 @@ export default async function JobPage({ params }: { params: { id: string } }) {
         <div className="divider" />
         <div className="kv">
           <span>Requirements hash</span>
-          <span className="row" style={{ gap: 8, justifyContent: 'flex-end' }}>
-            <span className="mono" style={{ whiteSpace: 'nowrap' }}>{shortHash(job.requirementsHash)}</span>
+          <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+            <span className="mono">{shortHash(job.requirementsHash)}</span>
             {hashMatches ? (
               <span className="status t-green">
-                <Icon name="check" size={13} strokeWidth={3} />
-                Match
+                <Icon name="check" size={12} strokeWidth={3} />
+                Matches Base
               </span>
             ) : null}
           </span>
         </div>
         <div className="kv">
           <span>Document</span>
-          <a className="chain-link" href={`${GATEWAY_URL}/v1/marketplace/jobs/${job.id}/requirements.json`} target="_blank" rel="noreferrer">
-            requirements.json
-            <Icon name="external" size={13} />
-          </a>
+          <ExternalLink href={`${GATEWAY_URL}/v1/marketplace/jobs/${job.id}/requirements.json`}>requirements.json</ExternalLink>
         </div>
         {onChain?.contract ? (
           <div className="kv">
             <span>Escrow contract</span>
-            <a className="chain-link" href={addressUrl(onChain.contract)} target="_blank" rel="noreferrer">
-              {shortHash(onChain.contract)}
-              <Icon name="external" size={13} />
-            </a>
+            <ExternalLink href={addressUrl(onChain.contract)}>{shortHash(onChain.contract)}</ExternalLink>
           </div>
         ) : null}
         {onChain?.refundClaimable ? (
           <div className="kv">
             <span>Refund</span>
-            <span className="status t-gold">Claimable by anyone</span>
+            <span className="status t-amber">Claimable by anyone</span>
           </div>
         ) : null}
         <div className="kv">
           <span>Job ID</span>
-          <span className="mono" style={{ whiteSpace: 'nowrap' }}>{shortHash(job.id)}</span>
+          <span className="mono">{shortHash(job.id)}</span>
         </div>
       </section>
     </>
