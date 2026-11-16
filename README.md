@@ -45,9 +45,11 @@ Copy `.env.example` to `.env.local`. By default the app reads the production gat
 
 ## Deploy
 
-1. **Backend:** the identity-service needs `SIWE_DOMAINS=base.kult.games` (comma-separated; add `localhost:3100` for local testing) and `BASE_RPC_URL`. Until that is live, the sign-in button says sign-in is unavailable.
-2. **This app:** import this repo into Vercel (Next.js, project root), add the domain `base.kult.games`, and set `KULT_GATEWAY_URL`, `BASE_RPC_URL` and `NEXT_PUBLIC_APP_URL`.
-3. **Base Dashboard:** register `https://base.kult.games`. Icon: `/brand/icon?size=1024` (1024×1024, opaque). Cover: `/opengraph-image` (1200×630).
+The app runs on Render at **https://baseapp.kult.games**.
+
+1. **Backend:** the identity-service needs `SIWE_DOMAINS=baseapp.kult.games` (comma-separated; add `localhost:3100` for local testing) and `BASE_RPC_URL`. Until that is live, the sign-in button says sign-in is unavailable.
+2. **This app:** in Render, choose New > Blueprint and pick this repo. `render.yaml` creates the `kult-baseapp` web service with its build and start commands, health check, domain and env vars. Enter `BASE_RPC_URL` when asked. Then point DNS for `baseapp.kult.games` at the Render service, using the record shown under Settings > Custom Domains.
+3. **Base Dashboard:** register `https://baseapp.kult.games`. Icon: `/brand/icon?size=1024` (1024×1024, opaque). Cover: `/opengraph-image` (1200×630).
 
 ## Not in this release
 

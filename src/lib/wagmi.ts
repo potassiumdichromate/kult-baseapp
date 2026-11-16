@@ -3,7 +3,7 @@ import { base } from 'wagmi/chains';
 import { baseAccount } from 'wagmi/connectors';
 
 export const APP_NAME = 'Kult on Base';
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://base.kult.games';
+export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://baseapp.kult.games';
 
 /**
  * Base mainnet only, one connector: Base Account.

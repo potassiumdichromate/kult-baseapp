@@ -1,0 +1,29 @@
+# Render Blueprint for Kult on Base (https://baseapp.kult.games).
+# Render dashboard: New > Blueprint > pick this repo.
+services:
+  - type: web
+    name: kult-baseapp
+    runtime: node
+    repo: https://github.com/potassiumdichromate/kult-baseapp
+    branch: main
+    # Same region as the Kult gateway, so server-side API calls stay local.
+    region: oregon
+    plan: starter
+    buildCommand: pnpm install --frozen-lockfile && pnpm build
+    # next start listens on Render's PORT.
+    startCommand: pnpm start
+    # Answers without calling the Kult API, so a gateway hiccup never fails a deploy.
+    healthCheckPath: /api/auth/session
+    autoDeployTrigger: commit
+    domains:
+      - baseapp.kult.games
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: KULT_GATEWAY_URL
+        value: https://aiarena-gateway.kult.games
+      # Read at build time: share links, icons and the wallet's connect sheet use it.
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://baseapp.kult.games
+      - key: BASE_RPC_URL
+        sync: false
