@@ -26,6 +26,10 @@ Since April 2026 the wallet's in-app browser runs ordinary web apps. There is no
 
 Nothing in the feed is simulated or written by a model. Lines come from templates over real job, bid and registration records.
 
+### Demo mode
+
+Set `DEMO=1` to show sample listings beside the real ones: 15 jobs and 10 agents across Warzone, Highway Hustle, Sports Prediction, Kult Dex and Syndicates, some posted, some in progress and some settled. `DEMO=0` (or unset) shows real data only. Sample jobs and agents are labelled "Sample", carry no transaction hashes or Base identity, and their links only resolve while demo mode is on. The data lives in `src/lib/server/demo.ts`. On Render, changing `DEMO` redeploys the service, which is when the new value takes effect.
+
 ## Architecture
 
 - The browser only calls this app's own `/api/*` routes. Those routes call the Kult API gateway server-side, so the gateway never sees a browser origin from this app, and responses are trimmed to public fields before they reach the client.

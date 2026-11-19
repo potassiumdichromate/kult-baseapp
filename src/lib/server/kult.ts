@@ -1,3 +1,14 @@
+import {
+  DEMO,
+  demoAgentProfile,
+  demoAgentPublic,
+  demoJobDetail,
+  demoJobs,
+  demoNegotiations,
+  isDemoAgentId,
+  isDemoJobId,
+  mergeJobs,
+} from './demo';
 import { gw, gwSoft } from './gateway';
 import type {
   AgentIdentity,
@@ -15,31 +26,49 @@ import type {
 const isUuid = (id: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 const isJobId = (id: string) => /^0x[0-9a-f]{64}$/i.test(id);
 
-export async function listJobs(scope: JobScope = 'all', limit = 100) {
-  const data = await gw<{ jobs: Job[]; counts: { open: number; active: number; completed: number } }>(
-    `/v1/marketplace/jobs?scope=${scope}&limit=${limit}`,
-  );
-  return data ?? { jobs: [], counts: { open: 0, active: 0, completed: 0 } };
+type JobList = { jobs: Job[]; counts: { open: number; active: number; completed: number } };
+
+export async function listJobs(scope: JobScope = 'all', limit = 100): Promise<JobList> {
+  const fetchReal = () => gw<JobList>(`/v1/marketplace/jobs?scope=${scope}&limit=${limit}`);
+  const empty: JobList = { jobs: [], counts: { open: 0, active: 0, completed: 0 } };
+
+  if (!DEMO) return (await fetchReal()) ?? empty;
+
+  // Demo mode: samples sit beside the real jobs, and still show if the API is down.
+  const real = (await fetchReal().catch(() => null)) ?? empty;
+  const sample = demoJobs(scope);
+  return {
+    jobs: mergeJobs(real.jobs, scope, limit),
+    counts: {
+      open: real.counts.open + sample.counts.open,
+      active: real.counts.active + sample.counts.active,
+      completed: real.counts.completed + sample.counts.completed,
+    },
+  };
 }
 
 export async function getJob(jobId: string): Promise<JobDetail | null> {
+  if (isDemoJobId(jobId)) return demoJobDetail(jobId);
   if (!isJobId(jobId)) return null;
   return gw<JobDetail>(`/v1/marketplace/jobs/${jobId}`);
 }
 
 export async function listNegotiations(jobId: string): Promise<Negotiation[]> {
+  if (isDemoJobId(jobId)) return demoNegotiations(jobId);
   if (!isJobId(jobId)) return [];
   const data = await gwSoft<{ negotiations: Negotiation[] }>(`/v1/marketplace/negotiations?jobId=${jobId}`);
   return data?.negotiations ?? [];
 }
 
 export async function getAgentProfile(agentId: string): Promise<AgentProfile | null> {
+  if (isDemoAgentId(agentId)) return demoAgentProfile(agentId);
   if (!isUuid(agentId)) return null;
   return gwSoft<AgentProfile>(`/v1/a2a/a2a/agents/${agentId}/profile`, { revalidate: 120 });
 }
 
 export async function getAgentIdentity(agentId: string): Promise<AgentIdentity | null> {
-  if (!isUuid(agentId)) return null;
+  // Sample agents have no identity on Base.
+  if (isDemoAgentId(agentId) || !isUuid(agentId)) return null;
   const data = await gwSoft<{ identity: AgentIdentity }>(`/v1/a2a/identity/agents/${agentId}`, { revalidate: 300 });
   return data?.identity ?? null;
 }
@@ -54,6 +83,7 @@ export async function getReputation(erc8004Id: string | null): Promise<Reputatio
  * including fields that must never leave the backend. Pick public fields only.
  */
 export async function getAgentPublic(agentId: string): Promise<AgentPublic | null> {
+  if (isDemoAgentId(agentId)) return demoAgentPublic(agentId);
   if (!isUuid(agentId)) return null;
   const data = await gwSoft<{ agent: Record<string, unknown> }>(`/v1/agents/${agentId}`, { revalidate: 120 });
   const agent = data?.agent;

@@ -52,6 +52,8 @@ export interface Job {
   deliveredAt: string | null;
   settledAt: string | null;
   createdAt: string;
+  /** A sample listing shown only in demo mode (DEMO=1). */
+  demo?: boolean;
 }
 
 export interface JobOnChain {
@@ -106,6 +108,8 @@ export interface AgentProfile {
   arena: { elo: number; wins: number; losses: number; draws: number };
   operator: { kind: string; name: string | null; since: string | null } | null;
   erc8004AgentId: string | null;
+  /** A sample agent shown only in demo mode (DEMO=1). */
+  demo?: boolean;
 }
 
 export interface AgentIdentity {
@@ -144,7 +148,8 @@ export interface LeaderboardEntry {
   draws: number;
 }
 
-export type Provenance = 'onchain' | 'service';
+/** onchain: a Base transaction backs it. service: a Kult record. demo: a sample listing. */
+export type Provenance = 'onchain' | 'service' | 'demo';
 
 /** A run of text in a feed line; runs with an agentId render as a link to that agent. */
 export interface FeedPart {

@@ -17,7 +17,10 @@ export function JobCard({ job, creatorName, creatorClan, bids }: {
   return (
     <Link href={`/jobs/${job.id}`} className="card enter">
       <div className="spread">
-        <Tag>{gameName(job.gameId)}</Tag>
+        <span className="row" style={{ gap: 6 }}>
+          <Tag>{gameName(job.gameId)}</Tag>
+          {job.demo ? <Tag tone="dim">Sample</Tag> : null}
+        </span>
         <StatusWord status={job.status} />
       </div>
 

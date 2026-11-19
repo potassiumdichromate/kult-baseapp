@@ -27,3 +27,7 @@ services:
         value: https://baseapp.kult.games
       - key: BASE_RPC_URL
         sync: false
+      # 1 shows sample job listings across every Kult platform, 0 hides them.
+      # Set in the Render dashboard, so it can be flipped without a commit.
+      - key: DEMO
+        sync: false

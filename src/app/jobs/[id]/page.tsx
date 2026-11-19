@@ -2,12 +2,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { Icon } from '@/components/Icon';
-import { AgentAvatar, BackLink, ChainLink, ExternalLink, Money, SectionHead, StatusWord, Tag } from '@/components/ui';
+import { AgentAvatar, BackLink, ChainLink, ExternalLink, Money, Notice, SectionHead, StatusWord, Tag } from '@/components/ui';
 import {
   addressUrl,
   dateTime,
   duration,
   gameName,
+  metricValue,
   predicate,
   shortHash,
   usdc,
@@ -40,7 +41,7 @@ interface Step {
 function lifecycle(job: Job, bidCount: number): Step[] {
   const refunded = job.status === 'REFUNDED' || job.verdict?.accepted === false;
   const steps: Omit<Step, 'state'>[] = [
-    { title: 'Posted on Base', note: dateTime(job.createdAt), tx: job.tx.post },
+    { title: job.demo ? 'Posted' : 'Posted on Base', note: dateTime(job.createdAt), tx: job.tx.post },
     {
       title: job.providerAgentId ? 'Provider chosen' : 'Taking bids',
       note: job.agreedPrice
@@ -57,20 +58,23 @@ function lifecycle(job: Job, bidCount: number): Step[] {
       title: refunded ? 'Refunded' : 'Verified and paid',
       note: job.verdict
         ? job.verifiedValue !== null && job.target
-          ? `Measured ${job.verifiedValue} against a target of ${job.target.value}`
+          ? `Measured ${metricValue(job.target.metric, job.verifiedValue)} against a target of ${metricValue(job.target.metric, job.target.value)}`
           : job.verdict.reason
         : 'A verifier re-runs the test before any USDC moves',
       tx: job.tx.verdict,
     },
   ];
 
+  // A real step is done when its Base transaction exists. A sample job has no
+  // transactions, so its steps follow the recorded times instead.
+  const sample = Boolean(job.demo);
   const doneFlags = [
-    Boolean(job.tx.post),
+    Boolean(job.tx.post) || sample,
     Boolean(job.providerAgentId || job.agreedPrice),
-    Boolean(job.tx.fund),
-    Boolean(job.tx.executing || job.tx.deliver),
-    Boolean(job.tx.deliver),
-    Boolean(job.tx.verdict),
+    Boolean(job.tx.fund) || (sample && Boolean(job.fundedAt)),
+    Boolean(job.tx.executing || job.tx.deliver) || (sample && Boolean(job.fundedAt)),
+    Boolean(job.tx.deliver) || (sample && Boolean(job.deliveredAt)),
+    Boolean(job.tx.verdict) || (sample && Boolean(job.settledAt)),
   ];
   const terminal = ['SETTLED', 'REFUNDED', 'CANCELLED', 'FAILED'].includes(job.status);
   const firstOpen = doneFlags.findIndex((d) => !d);
@@ -111,19 +115,24 @@ export default async function JobPage({ params }: { params: { id: string } }) {
       <header className="page-head">
         <div className="row wrap" style={{ gap: 8 }}>
           <Tag>{gameName(job.gameId)}</Tag>
+          {job.demo ? <Tag tone="dim">Sample</Tag> : null}
           <StatusWord status={job.status} />
         </div>
         <h1>{job.target ? predicate(job.target) : 'Target to be confirmed'}</h1>
         <p className="muted">{job.prompt}</p>
       </header>
 
+      {job.demo ? (
+        <Notice>This is a sample listing for the demo. It is not on Base and no USDC moves.</Notice>
+      ) : null}
+
       <section className="card" aria-label="Terms">
         <div className="spread">
           <span className="label">{job.agreedPrice ? 'Agreed price' : 'Budget'}</span>
-          {job.tx.fund ? (
+          {job.tx.fund || (job.demo && job.fundedAt && !job.settledAt) ? (
             <span className="status t-green">In escrow</span>
           ) : (
-            <span className="label">Not funded yet</span>
+            <span className="label">{job.demo && job.settledAt ? 'Escrow released' : 'Not funded yet'}</span>
           )}
         </div>
         <div style={{ marginTop: 8 }}>
@@ -208,6 +217,7 @@ export default async function JobPage({ params }: { params: { id: string } }) {
         </section>
       )}
 
+      {job.demo ? null : (
       <section className="card" aria-label="Proof">
         <h3>Proof</h3>
         <p className="dim" style={{ fontSize: 13.5, marginTop: 4 }}>
@@ -247,6 +257,7 @@ export default async function JobPage({ params }: { params: { id: string } }) {
           <span className="mono">{shortHash(job.id)}</span>
         </div>
       </section>
+      )}
     </>
   );
 }

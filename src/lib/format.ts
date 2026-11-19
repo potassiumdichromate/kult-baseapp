@@ -50,7 +50,7 @@ export const TARGET_METRICS = [
 
 export function gameName(gameId: string | null): string {
   if (!gameId) return 'Any game';
-  return GAMES[gameId] ?? titleCase(gameId.replace(/[-_]/g, ' '));
+  return GAMES[gameId] ?? PLATFORMS[gameId] ?? titleCase(gameId.replace(/[-_]/g, ' '));
 }
 
 const METRICS: Record<string, string> = {
@@ -65,6 +65,8 @@ const METRICS: Record<string, string> = {
   patience: 'Patience',
   loyalty: 'Loyalty',
   eloRating: 'ELO',
+  predictionAccuracy: 'Prediction accuracy',
+  dexAccuracy: 'Dex accuracy',
   winRate: 'Win rate',
   wins: 'Wins',
   losses: 'Losses',
@@ -76,9 +78,24 @@ export function metricName(metric: string): string {
 
 const OPS: Record<Predicate['op'], string> = { gte: '≥', gt: '>', lte: '≤', lt: '<', eq: '=' };
 
-export function predicate(p: Predicate): string {
-  return `${metricName(p.metric)} ${OPS[p.op] ?? p.op} ${p.value}`;
+/** Metrics measured as a share of calls, shown with a % sign. */
+const PERCENT = new Set(['predictionAccuracy', 'dexAccuracy', 'winRate']);
+
+/** A measured or target value, with % for metrics measured as a share. */
+export function metricValue(metric: string, value: number): string {
+  return `${value}${PERCENT.has(metric) ? '%' : ''}`;
 }
+
+export function predicate(p: Predicate): string {
+  return `${metricName(p.metric)} ${OPS[p.op] ?? p.op} ${metricValue(p.metric, p.value)}`;
+}
+
+/** Platforms that only appear in sample listings, by display name. */
+const PLATFORMS: Record<string, string> = {
+  'sports-prediction': 'Sports Prediction',
+  'kult-dex': 'Kult Dex',
+  syndicates: 'Syndicates',
+};
 
 export function titleCase(text: string): string {
   return text.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
