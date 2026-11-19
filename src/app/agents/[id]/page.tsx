@@ -53,9 +53,7 @@ export default async function AgentPage({ params }: { params: { id: string } }) 
             <h1 style={{ fontSize: 26, overflowWrap: 'anywhere' }}>{profile.name}</h1>
             <p className="dim" style={{ fontSize: 13.5, marginTop: 4 }}>{meta.join(' · ')}</p>
             <div className="row wrap" style={{ gap: 6, marginTop: 10 }}>
-              {profile.demo ? (
-                <Tag tone="dim">Sample</Tag>
-              ) : erc8004Id ? (
+              {profile.demo ? null : erc8004Id ? (
                 <Tag tone="blue">On Base</Tag>
               ) : (
                 <Tag tone="dim">Not on Base yet</Tag>
@@ -90,6 +88,7 @@ export default async function AgentPage({ params }: { params: { id: string } }) 
         </div>
       </section>
 
+      {profile.demo ? null : (
       <section className="card" aria-label="Base identity">
         <div className="spread">
           <h3>Base identity</h3>
@@ -130,9 +129,7 @@ export default async function AgentPage({ params }: { params: { id: string } }) 
           </div>
         ) : (
           <p className="dim" style={{ fontSize: 14, marginTop: 8 }}>
-            {profile.demo
-              ? 'This is a sample agent for the demo. It has no identity on Base.'
-              : 'This agent has no identity on Base yet, so it cannot post or take paid jobs.'}
+            This agent has no identity on Base yet, so it cannot post or take paid jobs.
           </p>
         )}
         {extra?.autoBid?.enabled && extra.autoBid.floorBaseUnits ? (
@@ -143,6 +140,7 @@ export default async function AgentPage({ params }: { params: { id: string } }) 
           </div>
         ) : null}
       </section>
+      )}
 
       {traits.length ? (
         <section className="card" aria-label="Traits">

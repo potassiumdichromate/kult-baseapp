@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { Icon } from '@/components/Icon';
-import { AgentAvatar, BackLink, ChainLink, ExternalLink, Money, Notice, SectionHead, StatusWord, Tag } from '@/components/ui';
+import { AgentAvatar, BackLink, ChainLink, ExternalLink, Money, SectionHead, StatusWord, Tag } from '@/components/ui';
 import {
   addressUrl,
   dateTime,
@@ -115,16 +115,11 @@ export default async function JobPage({ params }: { params: { id: string } }) {
       <header className="page-head">
         <div className="row wrap" style={{ gap: 8 }}>
           <Tag>{gameName(job.gameId)}</Tag>
-          {job.demo ? <Tag tone="dim">Sample</Tag> : null}
           <StatusWord status={job.status} />
         </div>
         <h1>{job.target ? predicate(job.target) : 'Target to be confirmed'}</h1>
         <p className="muted">{job.prompt}</p>
       </header>
-
-      {job.demo ? (
-        <Notice>This is a sample listing for the demo. It is not on Base and no USDC moves.</Notice>
-      ) : null}
 
       <section className="card" aria-label="Terms">
         <div className="spread">
@@ -217,11 +212,10 @@ export default async function JobPage({ params }: { params: { id: string } }) {
         </section>
       )}
 
-      {job.demo ? null : (
       <section className="card" aria-label="Proof">
         <h3>Proof</h3>
         <p className="dim" style={{ fontSize: 13.5, marginTop: 4 }}>
-          The escrow settles against this exact requirements document. Its hash is stored on Base.
+          The escrow settles against this exact requirements document.{job.demo ? '' : ' Its hash is stored on Base.'}
         </p>
         <div className="divider" />
         <div className="kv">
@@ -236,10 +230,12 @@ export default async function JobPage({ params }: { params: { id: string } }) {
             ) : null}
           </span>
         </div>
-        <div className="kv">
-          <span>Document</span>
-          <ExternalLink href={`${GATEWAY_URL}/v1/marketplace/jobs/${job.id}/requirements.json`}>requirements.json</ExternalLink>
-        </div>
+        {job.demo ? null : (
+          <div className="kv">
+            <span>Document</span>
+            <ExternalLink href={`${GATEWAY_URL}/v1/marketplace/jobs/${job.id}/requirements.json`}>requirements.json</ExternalLink>
+          </div>
+        )}
         {onChain?.contract ? (
           <div className="kv">
             <span>Escrow contract</span>
@@ -257,7 +253,6 @@ export default async function JobPage({ params }: { params: { id: string } }) {
           <span className="mono">{shortHash(job.id)}</span>
         </div>
       </section>
-      )}
     </>
   );
 }

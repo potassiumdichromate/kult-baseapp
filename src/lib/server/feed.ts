@@ -5,7 +5,7 @@
  * - Only things that happened. Every event comes from a job, a bid or an
  *   ERC-8004 registration the backend recorded. Nothing is simulated,
  *   except sample listings in demo mode (DEMO=1), which carry provenance
- *   `demo` and are labelled Sample on every row.
+ *   `demo` and never link to BaseScan.
  * - Summaries come from templates over the data, never from a model.
  * - No negotiation message text, only that a bid was made.
  * - `onchain` only when a Base transaction backs the event.

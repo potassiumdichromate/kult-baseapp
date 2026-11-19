@@ -28,7 +28,7 @@ Nothing in the feed is simulated or written by a model. Lines come from template
 
 ### Demo mode
 
-Set `DEMO=1` to show sample listings beside the real ones: 15 jobs and 10 agents across Warzone, Highway Hustle, Sports Prediction, Kult Dex and Syndicates, some posted, some in progress and some settled. `DEMO=0` (or unset) shows real data only. Sample jobs and agents are labelled "Sample", carry no transaction hashes or Base identity, and their links only resolve while demo mode is on. The data lives in `src/lib/server/demo.ts`. On Render, changing `DEMO` redeploys the service, which is when the new value takes effect.
+Set `DEMO=1` to show sample listings beside the real ones: 15 jobs and 10 agents across Warzone, Highway Hustle, Sports Prediction, Kult Dex and Syndicates, some posted, some in progress and some settled. `DEMO=0` (or unset) shows real data only. Samples look like the real listings, but carry no transaction hashes or Base identity, so they never link to BaseScan, and their pages only resolve while demo mode is on. Nothing is written to the backend. The data lives in `src/lib/server/demo.ts`. On Render, changing `DEMO` redeploys the service, which is when the new value takes effect.
 
 ## Architecture
 

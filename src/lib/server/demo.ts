@@ -5,10 +5,12 @@
  * platform: Warzone, Highway Hustle, Sports Prediction, Kult Dex and
  * Syndicates, in every state (posted, in progress, settled).
  *
- * Honesty rules, so a sample can never pass for a real record:
- * - Every sample job and agent carries `demo: true`, and the UI labels it "Sample".
- * - No transaction hashes, escrow contract or ERC-8004 identity. Nothing here
- *   links to BaseScan, because nothing here happened on Base.
+ * They render like real listings, with three limits:
+ * - No transaction hashes, escrow contract or ERC-8004 identity, so nothing
+ *   here links to BaseScan or says it is on Base. Borrowing hashes from real
+ *   jobs would make BaseScan vouch for jobs that never ran.
+ * - Nothing is written to the backend, so no settlement or reputation loop
+ *   ever sees these ids.
  * - Ids use a fixed `de30de30` prefix and only resolve while DEMO=1.
  */
 

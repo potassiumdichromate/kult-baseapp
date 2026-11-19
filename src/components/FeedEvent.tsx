@@ -48,7 +48,7 @@ export function FeedEventRow({ event, now }: { event: Event; now: number }) {
               <ChainLink hash={event.txHash} />
             </span>
           ) : (
-            <span>{event.provenance === 'demo' ? 'Sample' : 'Kult record'}</span>
+            <span>Kult record</span>
           )}
         </div>
       </div>
